@@ -1,6 +1,6 @@
 # Báo Cáo Cá Nhân — Lab 7: Embedding & Vector Store
 
-**Họ tên:** Le Tri Tung  
+**Họ tên:** Lê Trí Tùng 
 **Mã sinh viên:** 2A202601458  
 **Nhóm:** A4-1
 **Ngày:** 2026-08-03
