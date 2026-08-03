@@ -143,15 +143,38 @@ tests/test_solution.py::TestEmbeddingStoreDeleteDocument::test_delete_reduces_co
 
 ## 5. Kết quả truy xuất của tôi (Competition Results) — Cá nhân (10 điểm)
 
-Chạy **5 câu hỏi đánh giá của nhóm** trên mã nguồn cá nhân của bạn trong gói `src`.
+Tôi chạy **5 câu hỏi đánh giá của nhóm** trên mã nguồn cá nhân trong gói `src/VUXUANANH-2A202602010` kết hợp chiến lược `HeadingParagraphChunker` custom. Lệnh chạy benchmark chính thức:
 
-| # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan không? (Relevant) | Câu trả lời của Agent (tóm tắt) |
-|---|-------|--------------------------------|-------|-----------|------------------------|
-| 1 | (thống nhất với nhóm) | | | | |
-| 2 | (thống nhất với nhóm) | | | | |
-| 3 | (thống nhất với nhóm) | | | | |
-| 4 | (thống nhất với nhóm) | | | | |
-| 5 | (thống nhất với nhóm) | | | | |
+```bash
+python scripts/group_benchmark.py
+```
+
+### Bảng Kết Quả Chi Tiết
+
+| # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan không? | Câu trả lời của Agent (tóm tắt) |
+|---|----------------|--------------------------------------|-----------:|---------------------|--------------------------------|
+| 1 | Người mua cần làm gì khi muốn đổi trả sản phẩm bị lỗi? | `k4-returns-policy::chunk_1` | 5.00 | Có | Người mua gửi yêu cầu đổi trả trong thời hạn quy định và cung cấp hình ảnh/video làm bằng chứng. |
+| 2 | Người bán cần cung cấp thông tin gì trước khi bắt đầu bán hàng? | `k4-seller-listing::chunk_1` | 8.00 | Có | Người bán cần cung cấp thông tin định danh, tài khoản ngân hàng; hộ kinh doanh/doanh nghiệp cần ĐKKD và mã số thuế. |
+| 3 | Vì sao người mua nên thanh toán trong nền tảng? | `k4-payment-security::chunk_1` | 16.00 | Có | Thanh toán trong nền tảng giúp giữ lịch sử giao dịch, bằng chứng thanh toán và làm cơ sở giải quyết khi có tranh chấp. |
+| 4 | Khi đơn giao chậm hoặc thất lạc, người mua nên cung cấp thông tin gì? | `k4-shipping-support::chunk_1` | 10.00 | Có | Người mua liên hệ trung tâm hỗ trợ và cung cấp mã đơn hàng để đối soát lịch sử vận chuyển. |
+| 5 | Dữ liệu cá nhân được dùng cho những mục đích nào? | `k4-privacy-policy::chunk_1` | 12.00 | Có | Dữ liệu cá nhân dùng để xử lý đơn hàng, giao hàng, xác minh thanh toán, hỗ trợ khách hàng và cải thiện dịch vụ. |
+
+**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 5 / 5 (Đạt **10/10 điểm** điểm benchmark nhóm).
+
+### Top-3 doc_ids và scores theo từng câu hỏi
+
+| # | Top-3 doc_ids | Top-3 scores |
+|---|---------------|--------------|
+| 1 | `k4-returns-policy`, `k4-returns-policy`, `k4-privacy-policy` | 5.00, 3.00, 2.00 |
+| 2 | `k4-seller-listing`, `k4-seller-listing`, `k4-seller-listing` | 8.00, 8.00, 6.00 |
+| 3 | `k4-payment-security`, `k4-payment-security`, `k4-payment-security` | 16.00, 14.00, 12.00 |
+| 4 | `k4-shipping-support`, `k4-shipping-support`, `k4-shipping-support` | 10.00, 6.00, 4.00 |
+| 5 | `k4-privacy-policy`, `k4-privacy-policy`, `k4-privacy-policy` | 12.00, 2.00, 2.00 |
+
+### Phản Ngẫm & Bài Học Rút Ra
+
+1. **Chiến lược Heading/Paragraph custom phù hợp nhất với chính sách TMĐT**: Do tài liệu chính sách được chia theo các tiêu đề `#` và các đoạn văn nghiệp vụ `\n\n`, chiến lược custom này giữ trọn vẹn từng quy định/điều khoản trong một chunk độc lập thay vì bị cắt vụn.
+2. **Vai trò của Metadata Filter**: Tại câu 2 (*Thông tin người bán cần cung cấp*), việc sử dụng `metadata_filter={'customer_role': 'seller'}` giúp loại bỏ hoàn toàn nhiễu từ chính sách của người mua, đảm bảo 100% top-3 đều thuộc `k4-seller-listing`.
 
 ---
 
