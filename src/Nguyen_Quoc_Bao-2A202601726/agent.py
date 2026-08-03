@@ -1,6 +1,6 @@
 from typing import Callable
 
-from store import EmbeddingStore
+from .store import EmbeddingStore
 
 
 class KnowledgeBaseAgent:
