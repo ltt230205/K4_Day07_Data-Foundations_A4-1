@@ -4,15 +4,15 @@ title: Chính sách đổi trả
 customer_role: buyer        # buyer | seller | both
 category: returns
 language: vi
-source_url: https://example.com/chinh-sach/doi-tra
-retrieved_at: 2026-08-02
-document_version: "2026.1"
+source_url: https://www.lazada.vn/terms-of-use/
+retrieved_at: 2026-08-03
+document_version: "terms-index-crawled-2026-07"
 ---
 
-> Khối metadata phía trên là **template mẫu** cho K4 (bắt buộc: `customer_role` + `source_url` + `retrieved_at` + `document_version`, cùng ít nhất một trường hữu ích khác như `category`). Thay bằng nguồn công khai thật của nhóm trước khi dùng làm benchmark.
+# Chính sách đổi trả
 
-# Đổi trả hàng (dữ liệu khởi động)
+Người mua có thể tạo yêu cầu đổi trả khi sản phẩm nhận được bị lỗi, hư hỏng, thiếu phụ kiện, giao sai hàng hoặc không đúng mô tả. Yêu cầu đổi trả cần được gửi trong thời hạn được chính sách của sàn hoặc trang sản phẩm quy định.
 
-Người mua cần gửi yêu cầu đổi trả trong thời hạn được nêu trên trang sản phẩm hoặc chính sách của sàn. Yêu cầu phải kèm bằng chứng phù hợp khi hàng bị lỗi hoặc không đúng mô tả.
+Khi gửi yêu cầu, người mua nên cung cấp hình ảnh, video mở hàng hoặc bằng chứng mô tả vấn đề của sản phẩm. Những bằng chứng này giúp bộ phận hỗ trợ và người bán xác minh tình trạng hàng hóa.
 
-Người bán có trách nhiệm phản hồi theo quy trình của sàn. Nhóm phải bổ sung nguồn chính sách công khai, điều kiện và ngoại lệ cụ thể trước khi viết gold answer.
+Người bán có trách nhiệm phản hồi yêu cầu đổi trả theo quy trình của sàn. Nếu sản phẩm thuộc nhóm không được đổi trả hoặc thiếu bằng chứng, yêu cầu có thể bị từ chối.

@@ -1,3 +1,6 @@
 doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permission
-k4-returns-policy,data/k4_ecommerce/returns-policy.md,Chính sách đổi trả,https://example.com/chinh-sach/doi-tra,2026-08-02,2026.1,example-template-replace-me
-k4-seller-listing,data/k4_ecommerce/seller-listing.md,Quy định đăng bán,https://example.com/nguoi-ban/dang-ban,2026-08-02,2026.1,example-template-replace-me
+k4-returns-policy,data/k4_ecommerce/returns-policy.md,Chính sách đổi trả,https://www.lazada.vn/terms-of-use/,2026-08-03,terms-index-crawled-2026-07,public-web-summary
+k4-seller-listing,data/k4_ecommerce/seller-listing.md,Quy định đăng bán,https://sellercenter.lazada.vn/apps/register/index?gsc=1,2026-08-03,seller-center-crawled-2026-07,public-web-summary
+k4-payment-security,data/k4_ecommerce/payment-security.md,Chính sách bảo mật thanh toán,https://pages.lazada.vn/wow/gcp/lazada/channel/vn/partnership/chinh-sach-bao-mat-thanh-toan,2026-08-03,2022-12-14,public-web-summary
+k4-shipping-support,data/k4_ecommerce/shipping-support.md,Hỗ trợ giao hàng và nhận hàng,https://www.lazada.vn/terms-of-use/,2026-08-03,terms-index-crawled-2026-07,public-web-summary
+k4-privacy-policy,data/k4_ecommerce/privacy-policy.md,Chính sách bảo vệ thông tin cá nhân,https://www.lazada.vn/privacy/,2026-08-03,2025-04-23,public-web-summary
