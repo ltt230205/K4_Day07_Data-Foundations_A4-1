@@ -147,20 +147,22 @@ tests/test_solution.py::TestEmbeddingStoreDeleteDocument::test_delete_returns_tr
 
 ## 5. Kết quả truy xuất của tôi (Competition Results) — Cá nhân (10 điểm)
 
-> **Chưa phải kết quả chính thức:** nhóm chưa chốt bộ tài liệu thật và 5 câu hỏi đánh giá chung (`REPORT_NHOM.md` còn để trống, `data/k4_ecommerce/` hiện chỉ là dữ liệu mẫu/placeholder do lab cung cấp, nội dung còn ghi rõ "Nhóm phải bổ sung nguồn chính sách công khai... trước khi viết gold answer"). Bảng dưới là **demo tạm** chạy `EmbeddingStore` + `KnowledgeBaseAgent` cá nhân trên đúng 2 file mẫu này (`returns-policy.md`, `seller-listing.md`, `FixedSizeChunker(chunk_size=300, overlap=30)` → 5 chunk), dùng mock embedder, chỉ để chứng minh pipeline cá nhân chạy được đầu-cuối. **Sẽ chạy lại bảng này với 5 câu hỏi + tài liệu thật của nhóm** và (nếu có thể) embedder ngữ nghĩa thật ngay khi `REPORT_NHOM.md` được hoàn thiện.
+Chạy đúng **5 câu hỏi đánh giá chính thức của nhóm** (xem `REPORT_NHOM.md` — Mục 3, cùng bộ 5 tài liệu Lazada thật trong `data/k4_ecommerce/`) trên code cá nhân (`src/Do_Thi_Thanh_Loan_2A202601654`), dùng đúng chiến lược được nhóm phân công: **`FixedSizeChunker(chunk_size=300, overlap=0)`** (16 chunk). Dùng `keyword_embedding` xác định (deterministic, theo `scripts/group_benchmark.py` của nhóm — không dùng mock hash ngẫu nhiên) để kết quả lặp lại được. Cách chấm: 2đ nếu gold doc ở top-1, 1đ nếu gold doc nằm trong top-3, 0đ nếu không.
 
-| # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan không? (Relevant) | Câu trả lời của Agent (tóm tắt) |
-|---|-------|--------------------------------|-------|-----------|------------------------|
-| 1 | Người mua cần làm gì để được đổi trả hàng lỗi? | (seller-listing) "...bao gồm giá, mô tả và tình trạng hàng. Sản phẩm bị hạn chế..." | 0.142 | Không | Agent chỉ echo prompt (llm_fn demo là stub, chưa gọi LLM thật) |
-| 2 | Điều kiện để trở thành người bán trên sàn là gì? | (returns-policy) "...bổ sung nguồn chính sách công khai, điều kiện và ngoại lệ..." | 0.162 | Không | (như trên) |
-| 3 | Thời hạn phản hồi yêu cầu đổi trả của người bán là bao lâu? | (seller-listing) "...bao gồm giá, mô tả và tình trạng hàng..." | 0.126 | Không | (như trên) |
-| 4 | Quy định đăng bán sản phẩm có yêu cầu gì về mô tả? | (returns-policy) "...bổ sung nguồn chính sách công khai..." | 0.148 | Không (chunk đúng chủ đề — seller-listing — chỉ xếp hạng 2) | (như trên) |
-| 5 | Người mua có thể khiếu nại ở đâu nếu người bán không phản hồi? | (returns-policy) "Người mua cần gửi yêu cầu đổi trả trong thời hạn nêu trên trang sản phẩm..." | 0.160 | Một phần (đúng chủ đề đổi trả, nhưng không có câu trả lời cụ thể "khiếu nại ở đâu" trong dữ liệu mẫu) | (như trên) |
+| # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan không? (Relevant) | Điểm |
+|---|-------|--------------------------------|-------|-----------|---|
+| 1 | Người mua cần làm gì khi muốn đổi trả sản phẩm bị lỗi? | (k4-returns-policy) "Người mua có thể tạo yêu cầu đổi trả khi sản phẩm nhận được bị lỗi, hư hỏng..." | 7.00 | Có (đúng gold doc, top-1) | 2/2 |
+| 2 | Người bán cần cung cấp thông tin gì trước khi bắt đầu bán hàng? (lọc `customer_role=seller`) | (k4-seller-listing) "Người bán cần đăng ký tài khoản, cung cấp thông tin định danh và tài khoản ngân hàng..." | 12.00 | Có (đúng gold doc, top-1) | 2/2 |
+| 3 | Vì sao người mua nên thanh toán trong nền tảng? | (k4-payment-security) "Nền tảng hỗ trợ các giao dịch thanh toán trong hệ thống để người mua có thể..." | 16.00 | Có (đúng gold doc, top-1) | 2/2 |
+| 4 | Khi đơn giao chậm hoặc thất lạc, người mua nên cung cấp thông tin gì? | (k4-shipping-support) "...nên liên hệ trung tâm hỗ trợ và cung cấp mã đơn hàng. Mã đơn hàng giúp bộ phận hỗ trợ kiểm tra..." | 12.00 | Có (đúng gold doc, top-1) | 2/2 |
+| 5 | Dữ liệu cá nhân được dùng cho những mục đích nào? | (k4-privacy-policy) "...thông tin tài khoản, thông tin giao dịch và nội dung trao đổi với bộ phận hỗ trợ. Dữ liệu cá nhân được sử dụng..." | 12.00 | Có (đúng gold doc, top-1) | 2/2 |
 
-**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 0-1 / 5 (demo tạm)
+**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 5 / 5 — **Tổng điểm truy xuất: 10/10**
+
+> Kết quả này khớp với dòng "Đỗ Thị Thanh Loan — Fixed-size không overlap — 10/10" trong bảng benchmark của `REPORT_NHOM.md` (chạy độc lập trên code cá nhân, cùng công thức chấm, cùng embedding xác định — không dùng lại số của nhóm).
 
 **Điều hay nhất tôi học được từ thành viên khác / nhóm khác (qua demo):**
-> Chưa có dữ liệu vì nhóm chưa tổ chức buổi so sánh (chưa chốt tài liệu + câu hỏi đánh giá chung). Từ demo tạm của riêng tôi, bài học rút ra: kết quả truy xuất kém ở đây không phải do lỗi code (42/42 test pass, cơ chế dot-product + sort + top_k hoạt động đúng) mà do 2 yếu tố ngoài code — (1) mock embedder không phản ánh ngữ nghĩa, (2) dữ liệu mẫu quá ít (2 tài liệu, 5 chunk) và nội dung phần lớn là hướng dẫn/template chứ chưa phải chính sách thật — đúng như mục "Tác động của chiến lược dữ liệu" trong README. Điều này sẽ được cập nhật lại sau khi nhóm hoàn thành thu thập dữ liệu thật.
+> Từ bảng so sánh chiến lược trong `REPORT_NHOM.md`, cả 5 chiến lược (fixed-size không/có overlap, sentence, recursive, heading/paragraph custom của Vũ Xuân Anh) đều đạt 10/10 vì corpus hiện tại ngắn (5 tài liệu, mỗi tài liệu 1 chủ đề rõ) và câu hỏi bám sát gold answer — nên chưa phân biệt được chiến lược nào thực sự "tốt hơn". Bài học quan trọng nhất là ở **Câu 2**: nếu không dùng `search_with_filter(metadata_filter={"customer_role": "seller"})`, các chunk buyer (thanh toán, đổi trả) có thể lẫn vào do trùng từ ("thông tin", "tài khoản") — nghĩa là lọc metadata trước khi tìm quan trọng không kém việc chọn chiến lược chunking, đặc biệt khi corpus mở rộng và các tài liệu có nhiều từ vựng chung.
 
 ---
 
@@ -172,5 +174,5 @@ tests/test_solution.py::TestEmbeddingStoreDeleteDocument::test_delete_returns_tr
 | Hướng tiếp cận của tôi (My Approach) | 10 / 10 |
 | Hoàn thiện code (Core Implementation — tests) | 30 / 30 (42/42 pass; **cần copy `src/Do_Thi_Thanh_Loan_2A202601654/` đè lên `src/` trước khi nộp chính thức**) |
 | Dự đoán độ tương tự (Similarity Predictions) | 3 / 5 (đúng quy trình + phản ngẫm, nhưng chưa chạy được embedder ngữ nghĩa thật do máy bị chặn cài đặt) |
-| Kết quả truy xuất của tôi (Competition Results) | 3 / 10 (mới là demo tạm trên dữ liệu mẫu; cần chạy lại với 5 câu hỏi + tài liệu thật của nhóm) |
-| **Tổng phần cá nhân (tạm tính)** | **51 / 60** — sẽ lên ~58-60 sau khi cập nhật Mục 4 (embedder thật) và Mục 5 (dữ liệu + câu hỏi thật của nhóm) |
+| Kết quả truy xuất của tôi (Competition Results) | 10 / 10 (chạy đúng 5 câu hỏi + tài liệu thật của nhóm, khớp với benchmark trong `REPORT_NHOM.md`) |
+| **Tổng phần cá nhân (tạm tính)** | **58 / 60** — chỉ còn thiếu do Mục 4 chưa chạy được embedder ngữ nghĩa thật (máy bị chặn cài `sentence-transformers`) |
