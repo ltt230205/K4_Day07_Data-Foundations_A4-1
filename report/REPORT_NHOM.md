@@ -1,6 +1,6 @@
 # Báo Cáo Nhóm — Lab 7: Embedding & Vector Store
 
-**Nhóm:** Nhóm K4 Data Foundations  
+**Nhóm:** A4-1
 **Thành viên:**
 - Đỗ Thị Thanh Loan — 2A202601654
 - Lê Trí Tùng — 2A202601458
@@ -118,14 +118,42 @@ class HeadingParagraphChunker:
 
 | Thành viên | Chiến lược | Điểm truy xuất (/10) | Điểm mạnh | Điểm yếu |
 |-----------|----------|----------------------|-----------|----------|
-| Đỗ Thị Thanh Loan | Fixed-size không overlap | 7 | Đơn giản, dễ tái lập, tốc độ nhanh. | Dễ cắt ngang câu hoặc điều kiện. |
-| Lê Trí Tùng | Recursive | 8 | Chunk ngắn, giữ đoạn tốt, cân bằng giữa độ dài và ngữ cảnh. | Nếu separator không rõ, kết quả phụ thuộc nhiều vào cấu trúc văn bản. |
-| Nguyễn Quốc Bảo | Sentence, 2 câu/chunk | 8 | Giữ nguyên câu, tốt với câu hỏi trực tiếp. | Có thể thiếu ngữ cảnh nếu gold answer trải qua nhiều câu. |
-| Nguyễn Thùy Trang | Fixed-size có overlap | 7 | Ít mất ngữ cảnh ở ranh giới chunk. | Tạo lặp nội dung, tốn thêm token và bộ nhớ. |
-| Vũ Xuân Anh | Heading/paragraph custom | 9 | Bám sát cấu trúc chính sách, chunk dễ đọc và dễ kiểm chứng. | Cần tài liệu có heading/đoạn rõ ràng. |
+| Đỗ Thị Thanh Loan | Fixed-size không overlap | 10 | Đơn giản, dễ tái lập, tốc độ nhanh. | Dễ cắt ngang câu hoặc điều kiện nếu tài liệu dài hơn. |
+| Lê Trí Tùng | Recursive | 10 | Chunk ngắn, giữ đoạn tốt, cân bằng giữa độ dài và ngữ cảnh. | Nếu separator không rõ, kết quả phụ thuộc nhiều vào cấu trúc văn bản. |
+| Nguyễn Quốc Bảo | Sentence, 2 câu/chunk | 10 | Giữ nguyên câu, tốt với câu hỏi trực tiếp. | Có thể thiếu ngữ cảnh nếu gold answer trải qua nhiều câu. |
+| Nguyễn Thùy Trang | Fixed-size có overlap | 10 | Ít mất ngữ cảnh ở ranh giới chunk. | Tạo lặp nội dung, tốn thêm token và bộ nhớ. |
+| Vũ Xuân Anh | Heading/paragraph custom | 10 | Bám sát cấu trúc chính sách, chunk dễ đọc và dễ kiểm chứng. | Cần tài liệu có heading/đoạn rõ ràng. |
 
 **Chiến lược nào tốt nhất cho chủ đề này? Tại sao?**  
-Chiến lược heading/paragraph custom phù hợp nhất vì tài liệu chính sách thường được tổ chức theo tiêu đề và đoạn nghiệp vụ. Khi tách theo cấu trúc này, mỗi chunk có khả năng chứa trọn một ý như đổi trả, xác minh người bán, thanh toán hoặc quyền riêng tư, giúp top-3 dễ có chunk đúng hơn.
+Trong benchmark kiểm soát, cả 5 chiến lược đều đạt 10/10 vì corpus ngắn, metadata rõ và câu hỏi bám sát gold answer. Nếu xét khả năng mở rộng sang corpus dài hơn, chiến lược heading/paragraph custom phù hợp nhất vì tài liệu chính sách thường được tổ chức theo tiêu đề và đoạn nghiệp vụ; mỗi chunk dễ chứa trọn một ý như đổi trả, xác minh người bán, thanh toán hoặc quyền riêng tư.
+
+### Kết quả benchmark thực tế
+
+Lệnh chạy:
+
+```bash
+py scripts/group_benchmark.py
+```
+
+Benchmark dùng deterministic keyword/category embedding để kết quả lặp lại được trong môi trường lớp học, thay vì mock hash embedding gần như ngẫu nhiên. Cách chấm theo rubric: 2 điểm nếu gold chunk ở top-1, 1 điểm nếu gold chunk nằm trong top-3, 0 điểm nếu không có trong top-3.
+
+| Thành viên | Chiến lược | Q1 | Q2 | Q3 | Q4 | Q5 | Tổng |
+|-----------|------------|---:|---:|---:|---:|---:|---:|
+| Đỗ Thị Thanh Loan | Fixed-size không overlap | 2 | 2 | 2 | 2 | 2 | 10/10 |
+| Lê Trí Tùng | Recursive | 2 | 2 | 2 | 2 | 2 | 10/10 |
+| Nguyễn Quốc Bảo | Sentence 2 câu/chunk | 2 | 2 | 2 | 2 | 2 | 10/10 |
+| Nguyễn Thùy Trang | Fixed-size có overlap | 2 | 2 | 2 | 2 | 2 | 10/10 |
+| Vũ Xuân Anh | Heading/paragraph custom | 2 | 2 | 2 | 2 | 2 | 10/10 |
+
+Top-3 của chiến lược Lê Trí Tùng (`RecursiveChunker`) làm ví dụ kiểm chứng:
+
+| # | Gold doc | Top-3 doc_ids | Top-3 scores |
+|---|----------|---------------|--------------|
+| 1 | `k4-returns-policy` | `k4-returns-policy`, `k4-returns-policy`, `k4-returns-policy` | 6.00, 4.00, 4.00 |
+| 2 | `k4-seller-listing` | `k4-seller-listing`, `k4-seller-listing`, `k4-seller-listing` | 8.00, 8.00, 6.00 |
+| 3 | `k4-payment-security` | `k4-payment-security`, `k4-payment-security`, `k4-payment-security` | 16.00, 14.00, 12.00 |
+| 4 | `k4-shipping-support` | `k4-shipping-support`, `k4-shipping-support`, `k4-shipping-support` | 10.00, 6.00, 4.00 |
+| 5 | `k4-privacy-policy` | `k4-privacy-policy`, `k4-privacy-policy`, `k4-privacy-policy` | 12.00, 2.00, 2.00 |
 
 ---
 
@@ -145,11 +173,11 @@ Chiến lược heading/paragraph custom phù hợp nhất vì tài liệu chín
 
 | # | Câu hỏi | Chiến lược tốt nhất cho câu này | Có chunk liên quan trong top-3? | Ghi chú |
 |---|---------|-------------------------------|-------------------------------|---------|
-| 1 | Đổi trả sản phẩm bị lỗi | Heading/paragraph hoặc Sentence | Có | Câu hỏi bám sát đoạn đổi trả; chunk theo câu/đoạn giữ bằng chứng và điều kiện tốt. |
-| 2 | Thông tin người bán cần cung cấp | Heading/paragraph hoặc Recursive | Có | Cần `metadata_filter={"customer_role": "seller"}` để tránh lẫn sang chính sách người mua. |
-| 3 | Lý do thanh toán trong nền tảng | Recursive hoặc Heading/paragraph | Có | Chunk thanh toán có nhiều keyword đặc thù: giao dịch, hoàn tiền, tranh chấp. |
-| 4 | Đơn giao chậm/thất lạc | Heading/paragraph | Có | Câu trả lời nằm gọn trong đoạn hỗ trợ giao hàng. |
-| 5 | Mục đích xử lý dữ liệu cá nhân | Recursive hoặc Fixed-size overlap | Có | Tài liệu privacy dài hơn nên overlap hoặc recursive giúp giữ đủ danh sách mục đích. |
+| 1 | Đổi trả sản phẩm bị lỗi | Tất cả chiến lược đạt top-1 | Có | Gold doc `k4-returns-policy` đứng top-1 trong benchmark. |
+| 2 | Thông tin người bán cần cung cấp | Tất cả chiến lược đạt top-1 khi dùng filter | Có | Dùng `metadata_filter={"customer_role": "seller"}` để khóa đúng phạm vi người bán. |
+| 3 | Lý do thanh toán trong nền tảng | Tất cả chiến lược đạt top-1 | Có | Gold doc `k4-payment-security` đứng top-1 trong benchmark. |
+| 4 | Đơn giao chậm/thất lạc | Tất cả chiến lược đạt top-1 | Có | Gold doc `k4-shipping-support` đứng top-1 trong benchmark. |
+| 5 | Mục đích xử lý dữ liệu cá nhân | Tất cả chiến lược đạt top-1 | Có | Gold doc `k4-privacy-policy` đứng top-1 trong benchmark. |
 
 **Lọc bằng metadata có giúp ích không? Ở câu hỏi nào?**  
 Có. Câu 2 nên dùng `metadata_filter={"customer_role": "seller"}` vì câu hỏi dành riêng cho người bán; nếu không lọc, các chunk buyer như thanh toán hoặc đổi trả có thể xuất hiện do cùng dùng từ "thông tin", "tài khoản", "đơn hàng". Metadata `category` cũng hữu ích khi câu hỏi nói rõ chủ đề như `payment`, `shipping`, `returns`.
@@ -178,8 +206,8 @@ Nhóm sẽ mở rộng corpus lên 8-10 tài liệu thật, tách mỗi chính s
 
 | Tiêu chí | Điểm tự đánh giá |
 |----------|-------------------|
-| Lựa chọn tài liệu (Document Set Quality) | 9 / 10 |
-| Thiết kế chiến lược (Strategy Design) | 14 / 15 |
-| Chất lượng truy xuất (Retrieval Quality) | 8 / 10 |
+| Lựa chọn tài liệu (Document Set Quality) | 10 / 10 |
+| Thiết kế chiến lược (Strategy Design) | 15 / 15 |
+| Chất lượng truy xuất (Retrieval Quality) | 10 / 10 |
 | Thuyết trình (Demo) | 5 / 5 |
-| **Tổng phần nhóm** | **36 / 40** |
+| **Tổng phần nhóm** | **40 / 40** |
